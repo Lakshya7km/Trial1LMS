@@ -5,14 +5,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Admin Dashboard</title>
   <style>
-    /* CSS Styling */
+    /* Apply global styles */
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
     }
     body {
-      font-family: Arial, sans-serif;
+      font-family: 'Arial', sans-serif;
+      background-color: black;
+      color: black;
       display: flex;
       flex-direction: column;
       min-height: 100vh;
@@ -20,50 +22,106 @@
     header {
       display: flex;
       justify-content: space-between;
-      align-items: center;
-      padding: 1rem;
-      background-color: #4CAF50;
+      padding: 1rem 35rem;
+      background-color: black;
+      background-image: url('BackgroundBook.jpg');
+      background-size: cover;
+      background-position: bottom;
+      background-repeat: repeat;
+      
       color: white;
     }
+    h1 {
+      font-weight: normal;
+      color: #4CAF50 ;
+      
+      
+    }
+    header a {
+      color: white;
+      text-decoration: none;
+      font-size: 1.1rem;
+      background-color:grey;
+      padding: 0.5rem 1rem;
+      border-radius: 10px;
+    }
+    header a:hover {
+      background-color: black;
+    }
     .main-content {
-      margin: 2rem;
+      padding: 3rem;
+      flex: 1;
+    }
+    h2 {
+      margin-bottom: 0.5rem;
+      color: #4CAF50;
+    }
+    button {
+      padding: 0.8rem 1.5rem;
+      font-size: 1rem;
+      margin: 0.5rem 1rem 0.5rem 0;
+      cursor: pointer;
+      background-color: grey;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      transition: background-color 0.9s ease;
+    }
+    button:hover {
+      background-color: black;
     }
     table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 1rem;
+      margin-top: 1.5rem;
+      background-color: white;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     }
     th, td {
-      padding: 0.8rem;
+      padding: 1rem;
       text-align: left;
       border-bottom: 1px solid #ddd;
     }
-    button {
-      padding: 0.5rem 1rem;
-      font-size: 1rem;
-      margin-right: 1rem;
-      cursor: pointer;
-      background-color: #007bff;
-      color: white;
-      border: none;
-      border-radius: 3px;
+    th {
+      background-color: ;
+      color: #555;
     }
-    button:hover {
-      background-color: #0056b3;
+    td {
+      background-color: #fff;
+    }
+    tbody tr:hover {
+      background-color: #f9f9f9;
+    }
+    td button {
+      background-color: #dc3545;
+      padding: 0.5rem 1rem;
+      font-size: 0.9rem;
+      margin: 0;
+      border-radius: 1px;
+    }
+    td button:hover {
+      background-color: #c82333;
+    }
+    footer {
+      background-color: black ;
+      color: #4CAF50;
+      text-align: center;
+      padding: 1rem;
+      margin-top: auto;
     }
   </style>
 </head>
 <body>
 
 <header>
-  <h1>Admin Dashboard</h1>
-  <a href="/" style="color: white;">Logout</a>
+  <h1 style="text-align:center;">Admin Dashboard</h1>
+  <a href="/">Logout</a>
 </header>
 
 <main class="main-content">
   <h2>Admin Actions</h2>
   <button onclick="window.location.href='addbookform.html'">Add Book</button>
-  <button onclick="window.location.href='return.html'">update the return history</button>
+  <button onclick="window.location.href='return.html'">Update Return History</button>
   <button onclick="window.location.href='studentinfo.html'">Show Student Information</button>
 
   <h2>Books List</h2>
@@ -84,6 +142,10 @@
     </tbody>
   </table>
 </main>
+
+<footer>
+  <p>&copy; 2024 Admin Dashboard. All Rights Reserved.</p>
+</footer>
 
 <script>
   // Fetch and display the list of books
