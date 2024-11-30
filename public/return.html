@@ -81,11 +81,12 @@
                     row.insertCell(4).innerText = book.book_id;
                     row.insertCell(5).innerText = book.issue_date;
                     row.insertCell(6).innerText = book.return_date;
+                    row.insertCell(7).innerText = book.status;
 
                     // Dropdown for status change
-                    const statusCell = row.insertCell(7);
+                    const statusCell = row.insertCell(8);
                     const statusSelect = document.createElement('select');
-                    ['Pending', 'Returned'].forEach(status => {
+                    ['Returned'].forEach(status => {
                         const option = document.createElement('option');
                         option.value = status;
                         option.innerText = status;
@@ -95,7 +96,7 @@
                     statusCell.appendChild(statusSelect);
 
                     // Create action button for returning the book
-                    const actionCell = row.insertCell(8);
+                    const actionCell = row.insertCell(9);
                     const returnButton = document.createElement('button');
                     returnButton.innerText = 'Proceed';
                     returnButton.onclick = () => returnBook(book.id, statusSelect.value, row);  // Pass the row to remove it after return
