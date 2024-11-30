@@ -25,7 +25,7 @@
             justify-content: space-between;
             align-items: center;
             padding: 1rem;
-            background-color: #333; /* Dark grey for better contrast */
+            background-color: #333;
             color: white;
             position: sticky;
             top: 0;
@@ -44,29 +44,33 @@
             width: 200px;
         }
 
-        /* Sidebar Styling */
-        .sidebar {
-            background-color: #555;
-            color: white;
-            width: 20%;
-            padding: 1rem;
-            position: fixed;
-            top: 0;
-            bottom: 0;
-            left: 0;
+        /* Main Layout Styling */
+        .main-container {
             display: flex;
-            flex-direction: column;
+            flex-wrap: wrap; /* Ensures responsiveness for smaller screens */
+            padding: 1rem;
         }
 
-        /* Add margin-top to move student-info down */
-        .student-info {
-            margin-top: 250px; /* Adjust the value as needed */
+        .left-column,
+        .right-column {
+            padding: 1rem;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+            margin: 0.5rem;
         }
 
-        .main-content {
-            margin-left: 20%;
-            padding: 2rem;
-            flex-grow: 1;
+        .left-column {
+            flex: 1 1 30%; /* Adjusts to 30% width on large screens */
+            max-width: 400px;
+        }
+
+        .right-column {
+            flex: 2 1 65%; /* Adjusts to 65% width on large screens */
+        }
+
+        .right-column h2 {
+            margin-bottom: 1rem;
         }
 
         table {
@@ -101,8 +105,18 @@
             margin-top: 1rem;
         }
 
-        /* Media Query for mobile responsiveness */
+        /* Responsive Design */
         @media (max-width: 768px) {
+            .main-container {
+                flex-direction: column;
+            }
+
+            .left-column,
+            .right-column {
+                max-width: 100%;
+                flex: 1 1 100%; /* Full width for mobile screens */
+            }
+
             header input {
                 width: 150px;
             }
@@ -118,9 +132,10 @@
         <input type="text" id="searchBar" placeholder="Search books..." onkeyup="searchBooks()">
     </header>
 
-    <!-- Sidebar with Student Information -->
-    <aside class="sidebar">
-        <div class="student-info">
+    <!-- Main Content Container -->
+    <div class="main-container">
+        <!-- Left Column for Student Info -->
+        <section class="left-column">
             <h2>Student Information</h2>
             <p id="studentName">Name: Loading...</p>
             <p id="studentRoll">Roll Number: Loading...</p>
@@ -129,33 +144,33 @@
             <p id="studentYear">Year: Loading...</p>
             <p id="studentSemester">Semester: Loading...</p>
             <p id="studentContact">Contact: Loading...</p>
-        </div>
-        <div class="book-history">
-            <a href="book_history.html" style="color: black ; text-decoration: none;">View Book History</a>
-        </div>
-    </aside>
+            <div class="book-history">
+                <a href="book_history.html" style="text-decoration: none; color: #333;">View Book History</a>
+            </div>
+        </section>
 
-    <!-- Main Content for Book List -->
-    <main class="main-content">
-        <h2>Available Books</h2>
-        <div class="error-message" id="errorMessage"></div>
-        <table id="bookList">
-            <thead>
-                <tr>
-                    <th>Title</th>
-                    <th>Author</th>
-                    <th>ISBN</th>
-                    <th>Year</th>
-                    <th>Edition</th>
-                    <th>Status</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-            <tbody>
-                <!-- Book rows will be populated dynamically -->
-            </tbody>
-        </table>
-    </main>
+        <!-- Right Column for Available Books -->
+        <section class="right-column">
+            <h2>Available Books</h2>
+            <div class="error-message" id="errorMessage"></div>
+            <table id="bookList">
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Author</th>
+                        <th>ISBN</th>
+                        <th>Year</th>
+                        <th>Edition</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Book rows will be populated dynamically -->
+                </tbody>
+            </table>
+        </section>
+    </div>
 
     <script>
         // JavaScript for Dynamic Content
@@ -195,7 +210,7 @@
                 })
                 .then(data => {
                     const bookList = document.getElementById("bookList").getElementsByTagName("tbody")[0];
-                    bookList.innerHTML = "";  // Clear previous entries
+                    bookList.innerHTML = ""; // Clear previous entries
 
                     data.forEach(book => {
                         const row = bookList.insertRow();
@@ -214,88 +229,27 @@
                         yearCell.textContent = book.year;
                         editionCell.textContent = book.edition;
                         statusCell.textContent = book.is_available ? "Available" : "Issued";
-                
+
                         if (book.is_available) {
-                          const issueButton = document.createElement("button");
-                          issueButton.textContent = "View Book";
-                          issueButton.onclick = () => viewBook(book.id); // Pass book ID for redirect
-                          actionCell.appendChild(issueButton);
+                            const issueButton = document.createElement("button");
+                            issueButton.textContent = "View Book";
+                            issueButton.onclick = () => viewBook(book.id); // Pass book ID for redirect
+                            actionCell.appendChild(issueButton);
                         } else {
-                          actionCell.textContent = "Book is issued";
+                            actionCell.textContent = "Book is issued";
                         }
-                      });
-                    })
-                    .catch(error => {
-                      console.error("Error fetching book list:", error);
-                      document.getElementById("errorMessage").textContent = "Error loading book list.";
                     });
-                }
-                
-                // Redirect to bookinfo.html with book details
-                function viewBook(bookId) {
-                  window.location.href = `bookinfo.html?bookId=${bookId}`; // Pass bookId to the next page
-                }
-                
-                
-                
-                
-                    // Function to issue a book
-                function issueBook(bookId, row, event) {
-                  // Prevent form submission or page redirect if the button is inside a form
-                  if (event) event.preventDefault();
-                
-                  // Get the user ID from student info
-                  const userId = document.getElementById("studentRoll").textContent.split(": ")[1];
-                
-                  // Send POST request to issue the book
-                  fetch("/api/issue_book", {
-                    method: "POST",
-                    headers: {
-                      "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({ userId: userId, bookId: bookId }) // Pass both userId and bookId
-                  })
-                  .then(response => {
-                    if (!response.ok) throw new Error("Failed to issue book");
-                    return response.json();
-                  })
-                  .then(data => {
-                    // Check if the book was successfully issued and update the UI
-                    if (data.message === "Book issued successfully") {
-                      // Update the action and status in the same row
-                      row.cells[5].textContent = "Issued"; // Update status to "Issued"
-                      row.cells[6].textContent = "N/A"; // Disable action button since book is issued
-                    } else {
-                      throw new Error("Unexpected response from server.");
-                    }
-                  })
-                  .catch(error => {
-                    console.error("Error issuing book:", error);
-                    document.getElementById("errorMessage").textContent = "Error issuing book.";
-                  });
-                }
-                
-                
-                
-                
-                
-                
-                    // Function to search for books
-                    function searchBooks() {
-                      const input = document.getElementById("searchBar");
-                      const filter = input.value.toLowerCase();
-                      const table = document.getElementById("bookList");
-                      const tr = table.getElementsByTagName("tr");
-                
-                      for (let i = 1; i < tr.length; i++) { // Start from 1 to skip header
-                        const title = tr[i].getElementsByTagName("td")[0];
-                        if (title) {
-                          const txtValue = title.textContent || title.innerText;
-                          tr[i].style.display = txtValue.toLowerCase().includes(filter) ? "" : "none";
-                        }
-                      }
-                    }
-                  </script>
-                </body>
-                </html>
-                
+                })
+                .catch(error => {
+                    console.error("Error fetching book list:", error);
+                    document.getElementById("errorMessage").textContent = "Error loading book list.";
+                });
+        }
+
+        function viewBook(bookId) {
+            window.location.href = `bookinfo.html?bookId=${bookId}`; // Pass bookId to the next page
+        }
+    </script>
+</body>
+
+</html>
