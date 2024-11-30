@@ -17,7 +17,7 @@
         }
         h1 {
             margin-bottom: 1rem;
-           color: white;  
+           color: black;  
           
         }
         table {
@@ -30,6 +30,10 @@
             padding: 10px;
             text-align: left;
         }
+        button {
+          transform : translate(550px,0px);
+          
+      } 
         th {
             background-color: #f2f2f2;
         }
@@ -38,6 +42,9 @@
 <body>
 
 <h1>Student Information</h1>
+ <a href="admin_dashboard.html">
+    <button type="button">Go Back</button>
+</a>
 <button id="loadStudents">Load Student Information</button>
 <table id="studentsTable">
     <thead>
