@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Book Details</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: black;
+      color: #333;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 2rem;
+      background-image: url('Background2.jpg');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+    }
+
+    h2, h3 {
+      color: grey;
+      margin-bottom: 1rem;
+    }
+
+    #bookDetails, form {
+      background-color: white;
+      padding: 1.5rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 600px;
+      margin-bottom: 2rem;
+    }
+
+    #bookDetails p {
+      margin-bottom: 0.5rem;
+      font-size: 1rem;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: bold;
+      color: #2c3e50;
+    }
+
+    input[type="text"], input[type="date"] {
+      width: 100%;
+      padding: 0.8rem;
+      margin-bottom: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 1rem;
+      background-color: #f8f8f8;
+    }
+
+    input[type="text"]:focus, input[type="date"]:focus {
+      border-color: #3498db;
+      outline: none;
+    }
+
+    button {
+      padding: 0.8rem 1.5rem;
+      background-color: grey;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: background-color 0.9s;
+    }
+
+    button:hover {
+      background-color: black;
+    }
+
+    .error {
+      color: red;
+      font-size: 0.9rem;
+      margin-bottom: 1rem;
+    }
+
+    .success {
+      color: green;
+      font-size: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      body {
+        padding: 1rem;
+      }
+
+      #bookDetails, form {
+        padding: 1rem;
+        max-width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <h2>Book Details</h2>
+  <div id="bookDetails">Loading book details...</div>
+
+  <h3>Issue This Book</h3>
+  <form id="issueForm">
+    <label for="studentName">Student Name:</label>
+    <input type="text" id="studentName" placeholder="Enter student name" required>
+
+    <label for="userId">User ID (Roll Number):</label>
+    <input type="text" id="userId" placeholder="Enter user ID" required>
+
+    <label for="issueDate">Issue Date:</label>
+    <input type="date" id="issueDate" required>
+
+    <label for="returnDate">Return Date:</label>
+    <input type="date" id="returnDate" required>
+
+    <div class="error" id="errorMessage" style="display:none;"></div>
+    <div class="success" id="successMessage" style="display:none;"></div>
+
+    <button type="submit">Issue Book</button>
+  </form>
+
+  <script>
+    // Get bookId from URL query params
+    const urlParams = new URLSearchParams(window.location.search);
+    const bookId = urlParams.get('bookId');
+    let bookName = ""; // To store the book name
+
+    // Fetch book details from the backend
+    fetch(`/api/book/${bookId}`)
+      .then(response => response.json())
+      .then(data => {
+        bookName = data.title; // Store book name for later use
+
+        const bookDetailsDiv = document.getElementById('bookDetails');
+        bookDetailsDiv.innerHTML = `
+          <p><strong>Book Name:</strong> ${data.title}</p>
+          <p><strong>Author:</strong> ${data.author}</p>
+          <p><strong>ISBN:</strong> ${data.isbn}</p>
+          <p><strong>Year:</strong> ${data.year}</p>
+          <p><strong>Edition:</strong> ${data.edition}</p>
+          <p><strong>Status:</strong> ${data.is_available ? 'Available' : 'Issued'}</p>
+        `;
+      })
+      .catch(error => {
+        console.error('Error fetching book details:', error);
+        document.getElementById('bookDetails').innerHTML = "Error fetching book details.";
+      });
+
+    // Handle the issue book form submission
+    document.getElementById('issueForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      const studentName = document.getElementById('studentName').value.trim();
+      const userId = document.getElementById('userId').value.trim();
+      const issueDate = document.getElementById('issueDate').value;
+      const returnDate = document.getElementById('returnDate').value;
+
+      const errorMessage = document.getElementById('errorMessage');
+      const successMessage = document.getElementById('successMessage');
+
+      // Basic validation
+      if (!studentName || !userId || !issueDate || !returnDate) {
+        errorMessage.textContent = "All fields are required.";
+        errorMessage.style.display = "block";
+        successMessage.style.display = "none";
+        return;
+      }
+
+      errorMessage.style.display = "none";
+
+      // Confirmation dialog
+      if (!confirm(`Are you sure you want to issue "${bookName}" to ${studentName}?`)) {
+        return;
+      }
+
+      const data = {
+        userId,
+        studentName,
+        bookId,
+        bookName,
+        issueDate,
+        returnDate,
+        status: "Issued"
+      };
+
+      // Insert into the issued_books table
+      fetch('/api/issue-book', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+      })
+      .then(response => response.json())
+      .then(responseData => {
+        successMessage.textContent = responseData.message || "Book issued successfully.";
+        successMessage.style.display = "block";
+        errorMessage.style.display = "none";
+        document.getElementById('issueForm').reset(); // Clear the form
+      })
+      .catch(error => {
+        console.error('Error issuing book:', error);
+        errorMessage.textContent = 'Error issuing book. Please try again.';
+        errorMessage.style.display = "block";
+        successMessage.style.display = "none";
+      });
+    });
+  </script>
+
+</body>
+</html>
