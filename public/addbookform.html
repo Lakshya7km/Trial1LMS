@@ -1,108 +1,117 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
- <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
     <title>Add Book</title>
     <style>
         body {
-                font-family: sans-serif;
-    		margin: 10rem;
-   	 	align-items: center; 
-    		background-color: black;
- 	  	background-image: url('BookBackground.png');
-          
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 10rem auto;
+            align-items: center;
+            text-align: center;
+            background-image: url('Background1.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+
+        h1 {
+            color: grey;
         }
         h2 {
             margin-bottom: 1rem;
-            color:grey;
+            color: grey;
         }
         form {
             display: flex;
             flex-direction: column;
-            max-width: 400px;
+            max-width: 300px;
+            margin: auto;
         }
-        label 
-        {
-          margin-top: 1rem;
+        label {
+            margin-top: 0.5rem;
+            color: white;
         }
         input[type="text"],
         input[type="number"],
-      
         button {
             padding: 0.5rem;
-            margin-top: 0.1rem;
-            border: 3px solid grey;
+            margin-top: 0.5rem;
+            border: 2px solid grey;
             border-radius: 10px;
-          
         }
         button {
             background-color: grey;
             color: white;
             cursor: pointer;
+          position : absolute ;
+          transform :translate(50px,400px)
+            
         }
         button:hover {
             background-color: black;
+           transition: background-color 0.9s ease;
         }
-      
     </style>
 </head>
 <body>
 
 <h1>Add Book</h1>
+<a href="admin_dashboard.html">
+    <button type="button">Go Back</button>
+</a>
+
   
 <form id="addBookForm">
-    <label style="color: black;">Title</label>
+    <label for="title">Title</label>
     <input type="text" id="title" name="title" required>
 
-     <label style="color: black;">Author</label>
+    <label for="author">Author</label>
     <input type="text" id="author" name="author" required>
 
-     <label style="color: black;">ISBN</label>
+    <label for="isbn">ISBN</label>
     <input type="text" id="isbn" name="isbn" required>
 
-    <label style="color:black;">Year:</label>
+    <label for="year">Year</label>
     <input type="number" id="year" name="year" required>
 
-    <label style="color:black;">Edition:</label>
+    <label for="edition">Edition</label>
     <input type="text" id="edition" name="edition" required>
 
     <button type="submit">Save</button>
 </form>
 
-
 <script>
-   document.getElementById("addBookForm").addEventListener("submit", function(event) {
-    event.preventDefault();
+    document.getElementById("addBookForm").addEventListener("submit", function(event) {
+        event.preventDefault();
 
-    const bookData = {
-        title: document.getElementById("title").value,
-        author: document.getElementById("author").value,
-        isbn: document.getElementById("isbn").value,
-        year: document.getElementById("year").value,
-        edition: document.getElementById("edition").value
-    };
+        const bookData = {
+            title: document.getElementById("title").value,
+            author: document.getElementById("author").value,
+            isbn: document.getElementById("isbn").value,
+            year: document.getElementById("year").value,
+            edition: document.getElementById("edition").value
+        };
 
-    fetch('/api/addBook', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(bookData)
-    })
-    .then(response => {
-        if (response.ok) {
-            alert("Book added successfully!");
-            this.reset();
-        } else {
+        fetch('/api/addBook', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(bookData)
+        })
+        .then(response => {
+            if (response.ok) {
+                alert("Book added successfully!");
+                this.reset();
+            } else {
+                alert("Error adding book.");
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
             alert("Error adding book.");
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        alert("Error adding book.");
+        });
     });
-});
-
 </script>
 
 </body>
