@@ -145,6 +145,9 @@ app.get('/api/issued_books', (req, res) => {
     });
 });
 
+
+
+
 // Route to handle book return and update the existing record with 'Returned' status and return date
 app.post('/api/return_book/:id', (req, res) => {
     const { id } = req.params;
@@ -169,11 +172,59 @@ app.post('/api/return_book/:id', (req, res) => {
         db.query(updateQuery, values, (err, result) => {
             if (err) return res.status(500).json({ error: 'Error updating return record' });
 
-            // After successfully updating the book record, send the response
-            res.json({ message: 'Return recorded successfully' });
+            // After successfully updating the book record, update the book status to available (is_available = 1)
+            const updateBookQuery = 'UPDATE books SET is_available = 1 WHERE id = ?';
+            db.query(updateBookQuery, [book.book_id], (err) => {
+                if (err) return res.status(500).json({ error: 'Error updating book availability' });
+
+                res.json({ message: 'Return recorded successfully' });
+            });
         });
     });
 });
+
+// Issue book and insert into issued_books table
+app.post('/api/issue-book', (req, res) => {
+    const { userId, studentName, bookId, issueDate, returnDate, status } = req.body;
+
+    // Query to fetch the book details
+    db.query('SELECT * FROM books WHERE id = ?', [bookId], (err, book) => {
+        if (err) return res.status(500).json({ error: 'Error fetching book details' });
+        if (book.length === 0) return res.status(404).json({ error: 'Book not found' });
+
+        // Check if book is available
+        if (book[0].is_available === 0) {
+            return res.status(400).json({ error: 'Book is not available for issue' });
+        }
+
+        // Insert issued book information into issued_books table
+        const query = `
+            INSERT INTO issued_books (user_id, student_name, book_name, book_id, issue_date, return_date, status) 
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+        `;
+        const bookName = book[0].title; // Use the book's title from the fetched details
+
+        db.query(query, [userId, studentName, bookName, bookId, issueDate, returnDate, status], (err, result) => {
+            if (err) {
+                console.error('Error issuing book:', err);
+                return res.status(500).json({ error: 'Error issuing book' });
+            }
+
+            // Update book availability to not available (is_available = 0)
+            const updateBookQuery = 'UPDATE books SET is_available = 0 WHERE id = ?';
+            db.query(updateBookQuery, [bookId], (err) => {
+                if (err) {
+                    console.error('Error updating book availability:', err);
+                    return res.status(500).json({ error: 'Error updating book availability' });
+                }
+
+                res.status(200).json({ message: 'Book issued successfully' });
+            });
+        });
+    });
+});
+
+
 
 
 
@@ -226,29 +277,6 @@ app.get('/api/book/:bookId', (req, res) => {
     res.status(200).json(result[0]);
   });
 });
-
-// Issue book and insert into issued_books table
-app.post('/api/issue-book', (req, res) => {
-  const { userId, studentName, bookId, issueDate, returnDate, status } = req.body;
-
-  // Query to insert issued book information into the issued_books table
-  const query = `INSERT INTO issued_books (user_id, student_name, book_name, book_id, issue_date, return_date, status) 
-                 VALUES (?, ?, ?, ?, ?, ?, ?)`;
-
-  // Here, the correct variable should be 'bookName' instead of 'Bookname'
-  const bookName = req.body.bookName; // Ensure bookName is passed in the request body
-
-  db.query(query, [userId, studentName, bookName, bookId, issueDate, returnDate, status], (err, result) => {
-    if (err) {
-      console.error('Error issuing book:', err);
-      return res.status(500).json({ error: 'Error issuing book' });
-    }
-
-    res.status(200).json({ message: 'Book issued successfully' });
-  });
-});
-
-
 
 
 
