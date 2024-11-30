@@ -1,0 +1,1 @@
+>mysql -h sql12.freesqldatabase.com -u sql12748632 -p LTDuaq9p8Z
