@@ -4,11 +4,11 @@ const bodyParser = require('body-parser');
 const session = require('express-session');
 const path = require('path');
 const multer = require('multer');
-const upload = multer(); // Configure multer as needed
+const upload = multer(); // for future update
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// MySQL Database Connection (use environment variables or hardcoded fallback)
+// MySQL Database Connection with free database hosting service like free sql database
 const db = mysql.createConnection({
     host: process.env.DB_HOST || 'sql12.freesqldatabase.com', 
     user: process.env.DB_USER || 'sql12748632',    
@@ -16,7 +16,7 @@ const db = mysql.createConnection({
     database: process.env.DB_NAME || 'sql12748632' });
 
 
-// Middleware
+// Middleware this is responsiable for sending request and accepting it between the client and server ok
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, 'public')));
